@@ -2,7 +2,7 @@
 
 ![JNetHack-Web Banner](banner.jpg)
 
-ようこそ! This is a web version of [JNeckHack](https://jnethack.github.io/). It is intended to be used together with a browser pop-up dictionary plugin of your choice (e.g., Yomitan, etc.). Made for Japanese language learners.
+ようこそ! This is a web version of [JNeckHack](https://jnethack.github.io/). It is intended to be used together with a browser pop-up dictionary plugin of your choice (tested with Yomitan). Made for Japanese language learners.
 
 ## How To Play
 
