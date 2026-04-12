@@ -163,6 +163,7 @@
                     
                     // Wait a sec for stability before calling the main
                     // (Mozilla sometimes fail to star the game otherwise)
+                    xterm.focus();
                     xterm.writeln('JNetHack-Web starting in');
                     xterm.writeln('...3');
                     await sleep(300);
