@@ -1,0 +1,7 @@
+# Force LF for Makefiles
+Makefile eol=lf text
+makefile eol=lf text
+*.mk eol=lf text
+*.mak eol=lf text
+*.sh eol=lf text
+*.jnethackrc eol=lf text

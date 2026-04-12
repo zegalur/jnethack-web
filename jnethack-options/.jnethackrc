@@ -1,0 +1,30 @@
+# This is an nethackrc file. 
+# Edit this to setup the NetHack.
+# From: https://gist.github.com/nocksock/1317801
+
+OPTIONS=showexp,showscore,time,color,!autopickup
+OPTIONS=autodig,fruit:slime mold,boulder:0
+OPTIONS=msg_window:reversed
+OPTIONS=number_pad:1
+OPTIONS=suppress_alert:3.4.3
+OPTIONS=lit_corridor
+
+# The following are options not in vanilla NetHack:
+
+OPTIONS=use_darkgray
+
+OPTIONS=menucolors
+MENUCOLOR=" blessed "=green
+MENUCOLOR=" holy "=green
+MENUCOLOR=" cursed "=red
+MENUCOLOR=" unholy "=red
+MENUCOLOR=" cursed .* (being worn)"=orange&underline
+
+OPTIONS=sortloot:full
+OPTIONS=!bones
+
+# For more information on what you can set in your nethackrc file, refer to:
+#    http://www.nethack.org/v343/Guidebook.html#_TOCentry_42
+# or http://nethackwiki.com/wiki/Options
+
+# Happy hacking!

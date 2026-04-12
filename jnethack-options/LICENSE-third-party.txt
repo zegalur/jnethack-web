@@ -1,0 +1,1 @@
+1. `.jnethackrc` - Based on: https://gist.github.com/nocksock/1317801

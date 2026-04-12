@@ -1,0 +1,6 @@
+[submodule "jnethack-release"]
+	path = jnethack-release
+	url = https://github.com/jnethack/jnethack-release.git
+[submodule "xterm-pty"]
+	path = xterm-pty
+	url = https://github.com/mame/xterm-pty.git

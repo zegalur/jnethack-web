@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JNetHack Web</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/@xterm/xterm@6.0.0/css/xterm.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
+    <!-- <script src="https://unpkg.com/@xterm/addon-fit/lib/addon-fit.js"></script> -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0f0f17;
+        }
+        #terminal {
+            width: 100%;
+            min-height: 100px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        #help {
+            display: block;
+        }
+        .terminal-container {
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            background: #1e1e2e;
+        }
+        .terminal-header {
+            background: #181825;
+            color: #a6adc8;
+            font-size: 13px;
+            padding: 6px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #313244;
+            user-select: none;
+            font-family: monospace; 
+        }
+        .terminal-header a {
+            color: #89b4fa;
+            text-decoration: none;
+        }
+        .terminal-header a:hover {
+            text-decoration: underline;
+        }
+        .xterm-viewport::-webkit-scrollbar {
+            width: 10px;
+        }
+        .xterm-viewport::-webkit-scrollbar-thumb {
+            background: rgba(180, 180, 180, 0.3);
+            border-radius: 5px;
+        }
+        .xterm-viewport::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span>JNetHack | Status: <b id='stat'>OK</b></span>
+            <span><a href="https://github.com/jnethack/jnethack-release" target="_blank">JNetHack</a> • <a href="https://github.com/zegalur/jnethack-web" target="_blank">JNetHackWeb</a> • type <code>?</code> for help</span>
+        </div>
+        <div id="terminal"></div>
+    </div>
+    <script type="module">
+      import "https://unpkg.com/@xterm/xterm@6.0.0/lib/xterm.js";
+      import { openpty } from "https://unpkg.com/xterm-pty@0.12.0/index.mjs";
+      import initEmscripten from "./jnethack.mjs";
+
+      await document.fonts.load('300 20px "M PLUS 1 Code"');
+      
+      // let Firefox apply metrics
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+
+      const xterm = new Terminal({
+            cursorBlink: true,
+            cols: 80,
+            rows: 24,
+            fontFamily: '"M PLUS 1 Code", monospace',
+            fontSize: 20,
+            fontWeight: '300',
+            lineHeight: 1.0,
+            letterSpacing: 0.2,
+            theme: {
+                // Catppuccin Mocha base
+                background: '#1e1e2e',
+                foreground: '#cdd6f4',
+                cursor:     '#f5e0dc',
+                selection:  'rgba(245, 224, 220, 0.3)',
+                black:      '#45475a',
+                red:        '#f38ba8',
+                green:      '#a6e3a1',
+                yellow:     '#f9e2af',
+                blue:       '#89b4fa',
+                magenta:    '#f5c2e7',
+                cyan:       '#94e2d5',
+                white:      '#bac2de',
+                brightBlack:   '#585b70',
+                brightRed:     '#f38ba8',
+                brightGreen:   '#a6e3a1',
+                brightYellow:  '#f9e2af',
+                brightBlue:    '#89b4fa',
+                brightMagenta: '#f5c2e7',
+                brightCyan:    '#94e2d5',
+                brightWhite:   '#a6adc8'
+            },
+            rendererType: 'webgl',
+            allowTransparency: true,
+            scrollback: 5000
+      });
+      
+      // NOTE: "Fit" logic is disabled.
+
+      /*const fitAddon = new FitAddon.FitAddon();
+      xterm.loadAddon(fitAddon);*/
+
+      xterm.open(document.getElementById("terminal"));
+      //fitAddon.fit();
+
+      // Create master/slave objects
+      const { master, slave } = openpty();
+
+      // Connect the master object to xterm.js
+      xterm.loadAddon(master);
+
+      // Testing colored output
+      /*xterm.writeln("TEST! TEST!");
+      xterm.writeln("\u001b[1;30mThis is dark gray text\u001b[0m");
+      xterm.writeln("\u001b[0;37mThis is light gray text\u001b[0m");*/
+
+      const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+      const Module = await initEmscripten({
+          pty: slave,
+          noInitialRun: true,
+          setStatus: (s) => {
+              document.getElementById("stat").innerText = s ? s : "OK"; },
+          onExit: (status) => {
+            console.log(`onExit called with status ${status}`);
+            xterm.writeln("Terminated.");
+          },
+          preRun: [
+            (Module) => {
+                // Mount persistent saves
+                Module.FS.mkdir('/save');
+                Module.FS.mount(Module.IDBFS, {}, '/save');
+                Module.FS.syncfs(true, async function(err) {
+                    if (err) console.error('IDBFS load error:', err);
+                    else console.log('✓ Saves loaded from browser storage');
+                    
+                    // Wait a sec for stability before calling the main
+                    // (Mozilla sometimes fail to star the game otherwise)
+                    xterm.writeln('JNetHack-Web starting in');
+                    xterm.writeln('...3');
+                    await sleep(300);
+                    xterm.writeln('...2');
+                    await sleep(300);
+                    xterm.writeln('...1');
+                    await sleep(300);
+                    
+                    console.log('Calling `main()`...');
+                    await Module.callMain();
+                });
+            },
+          ],
+      });
+
+      // (resize) set initial values
+      /*Module.ccall('xterm_js_on_resize', 'number', 
+            ['number','number'], [xterm.cols, xterm.rows]);
+      //slave.resize(xterm.cols, xterm.rows);
+      // add event listener
+      window.addEventListener('resize', () => { 
+          fitAddon.fit(); 
+          Module.ccall('xterm_js_on_resize', 'number', 
+                ['number','number'], [xterm.cols, xterm.rows]);
+          slave.resize(xterm.cols, xterm.rows);
+      });*/
+    </script>
+</body>
+</html>
+

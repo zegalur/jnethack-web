@@ -1,0 +1,4 @@
+tmp/*
+build/*
+jnethack-files/*
+!jnethack-files/README.md
