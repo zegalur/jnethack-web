@@ -7,7 +7,7 @@
 ## How To Play
 
 You can play the current build directly in your browser using the link below:<br>
-[build-link-here](build-link-here)
+[https://zegalur.github.io/jnethack-web/](https://zegalur.github.io/jnethack-web/)
 
 ## How To Build
 
