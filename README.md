@@ -2,7 +2,7 @@
 
 ![JNetHack-Web Banner](banner.jpg)
 
-ようこそ! This is a web version of [JNeckHack](https://jnethack.github.io/). It is intended to be used together with a browser pop-up dictionary plugin of your choice (tested with Yomitan). Made for Japanese language learners.
+ようこそ! This is an unofficial browser-based version of [JNeckHack](http://www.jnethack.org/). It is intended to be used together with a pop-up dictionary plugin of your choice (tested with Yomitan). Made for Japanese language learners.
 
 ## How To Play
 
@@ -61,7 +61,7 @@ This will build JNetHack-Web and place it inside the release folder (`make BUILD
 This project was made possible thanks to the great tools and projects created by others:
 
 1. [NetHack](https://www.nethack.org/)
-2. [JNetHack](https://jnethack.github.io/)
+2. [JNetHack](http://www.jnethack.org/)
 3. [Emscripten](https://emscripten.org/)
 4. [xterm.js](https://xtermjs.org/)
 5. [xterm-pty.js](https://github.com/mame/xterm-pty)
