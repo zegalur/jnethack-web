@@ -47,6 +47,27 @@
             user-select: none;
             font-family: monospace; 
         }
+        #terminal-menu {
+            background: #131322;
+            color: #a6adc8;
+            font-size: 13px;
+            padding: 6px 16px;
+            display: flex;
+            border-bottom: 1px solid #313244;
+            user-select: none;
+            font-family: monospace; 
+        }
+        #terminal-menu span {
+            border: 1px solid #313244;
+            padding: 2px 10px;
+            margin: 0px 5px;
+            cursor: pointer;
+        }
+        #terminal-menu span:hover {
+            border: 1px solid #414264;
+            background: #181825;
+        }
+
         .terminal-header a {
             color: #89b4fa;
             text-decoration: none;
@@ -64,13 +85,25 @@
         .xterm-viewport::-webkit-scrollbar-track {
             background: transparent;
         }
+        #more {
+            cursor: pointer;
+            opacity: 50%;
+        }
+        #more:hover {
+            opacity: 100%;
+        }
     </style>
 </head>
 <body>
     <div class="terminal-container">
         <div class="terminal-header">
-            <span>JNetHack | Status: <b id='stat'>OK</b></span>
+            <span><span id="more">△</span> JNetHack | Status: <b id='stat'>OK</b></span>
             <span><a href="https://github.com/jnethack/jnethack-release" target="_blank">JNetHack</a> • <a href="https://github.com/zegalur/jnethack-web" target="_blank">JNetHackWeb</a> • type <code>?</code> for help</span>
+        </div>
+        <div id="terminal-menu">
+            <span id="new_game">New Game</span>
+            <span id="toggle_fullscreen">Toggle Fullscreen</span>
+            <span id="reload_page">Reaload Page</span>
         </div>
         <div id="terminal"></div>
     </div>
@@ -78,6 +111,30 @@
       import "https://unpkg.com/@xterm/xterm@6.0.0/lib/xterm.js";
       import { openpty } from "https://unpkg.com/xterm-pty@0.12.0/index.mjs";
       import initEmscripten from "./jnethack.mjs";
+
+      var more = document.getElementById("more");
+
+      more.onclick = function() {
+          var menu = document.getElementById("terminal-menu");
+          if(menu.style.display == 'none') {
+              menu.style.display = 'flex';
+              more.textContent = "△";
+          } else {
+              menu.style.display = 'none';
+              more.textContent = "▽";
+          }
+      };
+
+      document.getElementById("toggle_fullscreen").onclick = async function() {
+          if (!document.fullscreenElement)
+               document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+          xterm.focus();
+      };
+
+      document.getElementById("reload_page").onclick = async function() {
+          location.reload();
+      };
 
       await document.fonts.load('300 20px "M PLUS 1 Code"');
       
@@ -178,6 +235,26 @@
             },
           ],
       });
+
+      document.getElementById("new_game").onclick = async function() {
+          await Module.FS.syncfs(true, async function(err) {
+            const files = await Module.FS.readdir("./save");
+            files.forEach(file => {
+              if (file === '.' || file === '..') return;
+              const fullPath = './save/' + file;
+              const stats = Module.FS.stat(fullPath);
+              if (!Module.FS.isDir(stats.mode)) {
+                Module.FS.unlink(fullPath);
+                console.log('File "' + fullPath + ' unlinked.');
+              }
+            });
+            await Module.FS.syncfs(false, async function(err) {
+              if (err) console.error('IDBFS load error:', err);
+              else console.log('✓ Save files removed');
+              location.reload();
+            });
+          });
+      };
 
       // (resize) set initial values
       /*Module.ccall('xterm_js_on_resize', 'number', 

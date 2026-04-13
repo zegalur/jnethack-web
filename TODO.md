@@ -13,3 +13,5 @@ JNetHack-Web TODO list.
 
 - [x] Persistent Save/Load logic.
 - [x] Use fixed versions of xterm.js and xterm-pty for better long-term support.
+- [x] 'New Game' button that removes save files and reloads the game.
+

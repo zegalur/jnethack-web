@@ -4,6 +4,10 @@ All significant modifications to this project will be recorded in this file. The
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-13
+
+- Added: Menu with `New Game`, `Toggle Fullscreen`, and `Reload Page` buttons.
+
 ## [1.0.0] - 2026-04-12
 
 ### Added
