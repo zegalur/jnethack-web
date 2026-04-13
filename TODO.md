@@ -9,6 +9,8 @@ JNetHack-Web TODO list.
 
 ### In Progress
 
+- [ ] Save `record` file in the persistent storage.
+
 ### Done ✓
 
 - [x] Persistent Save/Load logic.

@@ -214,10 +214,39 @@
                 // Mount persistent saves
                 Module.FS.mkdir('/save');
                 Module.FS.mount(Module.IDBFS, {}, '/save');
+                // Mount other persistent data
+                Module.FS.mkdir('/other');
+                Module.FS.mount(Module.IDBFS, {}, '/other');
+                // Sync
                 Module.FS.syncfs(true, async function(err) {
                     if (err) console.error('IDBFS load error:', err);
-                    else console.log('✓ Saves loaded from browser storage');
+                    else console.log('✓ Persistent data loaded from browser storage');
                     
+                    // Copy files from `./other` to './'
+                    const other_files = await Module.FS.readdir("./other");
+                    other_files.forEach(file => {
+                        if (file === '.' || file === '..') return;
+                        const fullPath = './other/' + file;
+                        const stats = Module.FS.stat(fullPath);
+                        if (!Module.FS.isDir(stats.mode)) {
+                            var content = Module.FS.readFile(fullPath);
+                            Module.FS.writeFile("./" + file, content);
+                            console.log("File `" + file + "` restored.");
+                        }
+                    });
+
+                    // Periodically copy into `other` these files
+                    const WATCH_LIST = ["record", "logfile", "xlogfile"];
+                    const intervalId = setInterval(() => {
+                      for(const file of WATCH_LIST) {
+                        var content = Module.FS.readFile("./" + file);
+                        Module.FS.writeFile("./other/" + file, content);
+                        console.log(content);
+                      }
+                      Module.FS.syncfs(false, function(err) {
+                        if (err) console.error('IDBFS load error:', err); });
+                    }, 1000);
+
                     // Wait a sec for stability before calling the main
                     // (Mozilla sometimes fail to star the game otherwise)
                     xterm.focus();
