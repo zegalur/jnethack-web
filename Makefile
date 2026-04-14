@@ -51,7 +51,8 @@ LDFLAGS := \
 	-sEXPORTED_FUNCTIONS=_main,_xterm_js_on_resize \
 	-sEXPORTED_RUNTIME_METHODS=FS,IDBFS,ccall,callMain \
 	-sENVIRONMENT=web \
-	-Wl,--wrap=getmailstatus,--wrap=nh_compress,--wrap=nh_uncompress \
+	-sEXIT_RUNTIME=1 \
+	-Wl,--wrap=getmailstatus,--wrap=nh_compress,--wrap=nh_uncompress,--wrap=nh_terminate \
 	$(L_OPT)
 
 

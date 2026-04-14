@@ -12,15 +12,63 @@
 
 #include <emscripten.h>
 
-EM_ASYNC_JS(void, sync_idbfs_save, (void), {
-  Module.FS.syncfs(false, (err) => {
-      if (err) console.error('IDBFS save error:', err);
-      else console.log('✓ Saved to browser storage');
+EM_ASYNC_JS(void, sync_idbfs, (), {
+  console.log('sync_idbfs() called...');
+  
+  // Remove everything from `other` before copying back.
+  const other_files = FS.readdir('./other/');
+  for(const file of other_files) {
+    if((file === '.') || (file === '..')) continue;
+    const fullPath = './other/' + file;
+    Module.FS.unlink(fullPath);
+  }
+
+  // Copy some files into a persistent folder.
+    
+  const WATCH_LIST = ["record", "logfile", "xlogfile"];
+
+  for(const file of WATCH_LIST) {
+    var content = Module.FS.readFile(file);
+    Module.FS.writeFile("./other/" + file, content);
+    console.log('File `' + file + '` copied')
+  }
+
+  // Copy "bon" files from the playground dir into 'other'.
+  // TODO: remove this in a case we know bon files are in '\save' dir.
+  const files = FS.readdir('./');
+  for(const file of files) {
+    //console.log(file);
+    if(file.startsWith("bon")) {
+        var content = Module.FS.readFile(file);
+        Module.FS.writeFile("./other/" + file, content);
+        console.log('File `' + file + '` copied')
+    }
+  }
+
+  // Sync
+  
+  await new Promise((resolve, reject) => {
+    FS.syncfs(false, (err) => {
+      if (err) {
+        console.error('IDBFS save error:', err);
+        reject(err);
+      } else {
+        console.log('✓ Saved to browser storage');
+        resolve();
+      }
+    });
   });
 });
+
 void __cdecl __wrap_getmailstatus() { /* empty */ }
 void __cdecl __wrap_nh_uncompress(const char* file_name) { /* empty */ }
-void __cdecl __wrap_nh_compress(const char* file_name) { sync_idbfs_save(); }
+void __cdecl __wrap_nh_compress(const char* file_name) { /* empty */ }
+
+void __real_nh_terminate(int status);
+void __cdecl __wrap_nh_terminate(int status) {
+    sync_idbfs();
+    __real_nh_terminate(status);
+}
 
 
 //////////////////////////////// Other ////////////////////////////////////////

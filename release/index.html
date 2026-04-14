@@ -102,6 +102,8 @@
         </div>
         <div id="terminal-menu">
             <span id="new_game">New Game</span>
+            <span id="full_reset">Full Reset</span>
+            &nbsp; <b style="opacity:30%;">|</b> &nbsp;
             <span id="toggle_fullscreen">Toggle Fullscreen</span>
             <span id="reload_page">Reaload Page</span>
         </div>
@@ -207,7 +209,8 @@
               document.getElementById("stat").innerText = s ? s : "OK"; },
           onExit: (status) => {
             console.log(`onExit called with status ${status}`);
-            xterm.writeln("Terminated.");
+            xterm.writeln(`\nonExit() called with status ${status}.`);
+            xterm.writeln("\n\u001b[0;32mTerminated.");
           },
           preRun: [
             (Module) => {
@@ -235,18 +238,6 @@
                         }
                     });
 
-                    // Periodically copy into `other` these files
-                    const WATCH_LIST = ["record", "logfile", "xlogfile"];
-                    const intervalId = setInterval(() => {
-                      for(const file of WATCH_LIST) {
-                        var content = Module.FS.readFile("./" + file);
-                        Module.FS.writeFile("./other/" + file, content);
-                        console.log(content);
-                      }
-                      Module.FS.syncfs(false, function(err) {
-                        if (err) console.error('IDBFS load error:', err); });
-                    }, 1000);
-
                     // Wait a sec for stability before calling the main
                     // (Mozilla sometimes fail to star the game otherwise)
                     xterm.focus();
@@ -259,7 +250,7 @@
                     await sleep(300);
                     
                     console.log('Calling `main()`...');
-                    await Module.callMain();
+                    Module.callMain();
                 });
             },
           ],
@@ -270,6 +261,7 @@
             const files = await Module.FS.readdir("./save");
             files.forEach(file => {
               if (file === '.' || file === '..') return;
+              if(file.startsWith("bon")) return; // skip bones files
               const fullPath = './save/' + file;
               const stats = Module.FS.stat(fullPath);
               if (!Module.FS.isDir(stats.mode)) {
@@ -280,6 +272,29 @@
             await Module.FS.syncfs(false, async function(err) {
               if (err) console.error('IDBFS load error:', err);
               else console.log('✓ Save files removed');
+              location.reload();
+            });
+          });
+      };
+
+      document.getElementById("full_reset").onclick = async function() {
+          await Module.FS.syncfs(true, async function(err) {
+            const DEL_FROM = ["./save", "./other"];
+            for(const pre of DEL_FROM) {
+              const files = await Module.FS.readdir(pre);
+              files.forEach(file => {
+                if (file === '.' || file === '..') return;
+                const fullPath = pre + '/' + file;
+                const stats = Module.FS.stat(fullPath);
+                if (!Module.FS.isDir(stats.mode)) {
+                  Module.FS.unlink(fullPath);
+                  console.log('File "' + fullPath + ' unlinked.');
+                }
+              });
+            }
+            await Module.FS.syncfs(false, async function(err) {
+              if (err) console.error('IDBFS load error:', err);
+              else console.log('✓ All files removed. Full reset done.');
               location.reload();
             });
           });
