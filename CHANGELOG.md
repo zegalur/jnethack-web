@@ -4,6 +4,13 @@ All significant modifications to this project will be recorded in this file. The
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-14
+
+- Added: More data are now persistent - `record`, `logfile`, `xlogfile`.
+- Added: `Full Reset` menu button.
+- Fixed: Now we see `Terminated` after game terminated.
+- Fixed: `FS.syncfs` is now called only before the `main()` and just before the termination, making it more stable and predictable.
+
 ## [1.1.0] - 2026-04-13
 
 - Added: Menu with `New Game`, `Toggle Fullscreen`, and `Reload Page` buttons.
