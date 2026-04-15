@@ -111,7 +111,9 @@
             <span id="full_reset">Full Reset</span>
             <div class="separator"></div>
             <span id="toggle_fullscreen">Toggle Fullscreen</span>
-            <span id="reload_page">Reaload Page</span>
+            <span id="reload_page">Reaload</span>
+            <div class="separator"></div>
+            <span id="copy_selected">Copy Selected</span>
         </div>
         <div id="terminal"></div>
     </div>
@@ -200,6 +202,12 @@
 
       // Connect the master object to xterm.js
       xterm.loadAddon(master);
+
+      document.getElementById("copy_selected").onclick = async function() {
+        const selection = xterm.getSelection();
+        if (selection)
+            navigator.clipboard.writeText(selection);
+      };
 
       // Testing colored output
       /*xterm.writeln("TEST! TEST!");

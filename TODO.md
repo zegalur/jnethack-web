@@ -6,7 +6,7 @@ JNetHack-Web TODO list.
 
 - [ ] Terminal's resize logic (optional).
 - [ ] Test if bones files are actually saved/loaded.
-- [ ] Fix, if possible, the `Ctrl+C` behaviour.
+- [ ] Fix, if possible, the `Ctrl+C` behavior.
 
 ### In Progress
 

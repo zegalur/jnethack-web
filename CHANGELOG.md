@@ -4,6 +4,10 @@ All significant modifications to this project will be recorded in this file. The
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-04-15
+
+- Added: `Copy Selected` menu button.
+
 ## [1.2.0] - 2026-04-14
 
 - Added: More data are now persistent - `record`, `logfile`, `xlogfile`.
